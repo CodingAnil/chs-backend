@@ -20,4 +20,5 @@ module.exports = {
   externals: {
     _http_common: "commonjs _http_common",
   },
+  ignoreWarnings: [/node_modules/],
 };
