@@ -45,6 +45,7 @@
     "mock-aws-s3": "^4.0.2",
     "nock": "^14.0.0",
     "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   }
 }
