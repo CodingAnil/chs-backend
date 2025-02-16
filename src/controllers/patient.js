@@ -5,7 +5,7 @@ const {
   handleingError,
   capitalizeFirstLetter,
 } = require("../utils");
-const bcrypt = require("bcrypt");
+
 const { calculateAge } = require("../utils/helpers/patient");
 const PatientAppointment = require("../models/userAppointment");
 const PatientReports = require("../models/userReports");

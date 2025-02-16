@@ -1,6 +1,6 @@
 const { sendResponse, generateToken } = require("../../utils");
 const User = require("../../models/user");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { JWT_SECRET } = require("../../configs");
 const jwt = require("jsonwebtoken");
 const { getUserByEmail, hideInfo } = require("../../controllers/user");
@@ -119,7 +119,9 @@ const resetPassword = async (req, res) => {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     user.password = hashedPassword;
     await user.save();
     return sendResponse(res, 200, "Password reset successfully");
@@ -163,7 +165,7 @@ const suspendUser = async (req, res) => {
         `Model Media not selected as cover or 18+ cover photo!`
       );
     }
-    
+
     const suspendedUser = await User.findByIdAndUpdate(
       userId,
       {
@@ -273,7 +275,6 @@ const deleteContent = async (req, res) => {
     return sendResponse(res, 500, error.message);
   }
 };
-
 
 module.exports = {
   login,

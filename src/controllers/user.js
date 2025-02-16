@@ -11,13 +11,13 @@ const {
   handleingError,
   capitalizeFirstLetter,
 } = require("../utils");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 // const { forSendEmail } = require("../utils/helpers/sendEmail");
 
 const signUp = async (req, res) => {
   try {
     const { name, phoneNumber, email, password, address, role } = req.body;
-  
+
     if (!phoneNumber || !password) {
       return sendResponse(res, 400, "Phone number and password are required!");
     }
@@ -31,7 +31,8 @@ const signUp = async (req, res) => {
       return sendResponse(res, 400, "This email is already used");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     let newProfile = null;
     if (role?.toLowerCase() == "patient") {
@@ -118,7 +119,8 @@ const resetPassword = async (req, res) => {
 
     await UserOtp.findByIdAndDelete(userOtp?._id);
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     let user = await User?.findOneAndUpdate(
       { phoneNumber },
@@ -233,7 +235,8 @@ const updateUser = async (req, res) => {
           "Please use a different password than your current one"
         );
       }
-      updateFields.password = await bcrypt.hash(password, 10);
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(password, salt);
     }
 
     if (role) {
@@ -265,7 +268,6 @@ const login = async (req, res) => {
   try {
     const { phoneNumber, password } = req.body;
 
-    // Check if email and password are provided
     if (!phoneNumber || !password) {
       return sendResponse(res, 400, "Phone number and Password are required!");
     }
