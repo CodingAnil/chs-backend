@@ -64,10 +64,13 @@ const productSchema = new Schema(
       type: String,
       unique: true,
     },
-    type: {
+    category: {
       type: String,
-      enum: ["Tablet", "Suyrup"],
-      default: "Suyrup",
+      default: null,
+    },
+    subcategory: {
+      type: String,
+      default: null,
     },
     status: {
       type: String,
