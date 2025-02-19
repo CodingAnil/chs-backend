@@ -301,6 +301,40 @@ const login = async (req, res) => {
   }
 };
 
+const adminLogin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!password || !(name || email)) {
+      return sendResponse(res, 400, "Name/Email and Password are required!");
+    }
+
+    const user = await User.findOne({ $or: [{ name }, { email }] });
+    if (!user || user.role !== "Admin") {
+      return sendResponse(
+        res,
+        400,
+        !user ? "This account does not exist." : "Only admins can log in."
+      );
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      return sendResponse(res, 400, "Incorrect password.");
+    }
+
+    const userProfile = await getUserWithProfile(user.email);
+    const accessToken = generateToken(userProfile);
+
+    return sendResponse(res, 200, "Login successful", {
+      ...userProfile,
+      accessToken,
+    });
+  } catch (error) {
+    console.error(error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
 const getUpdatedProfile = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -367,6 +401,56 @@ const getUser = async (req, res) => {
   }
 };
 
+// Get all users with pagination
+const getAllUsers = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      type = "patient",
+      sort = "createdAt",
+      order = "desc",
+    } = req.query;
+
+    const query = {
+      $or: [
+        { firstName: { $regex: search, $options: "i" } },
+        { designation: { $regex: search, $options: "i" } },
+      ],
+    };
+
+    // Pagination and sorting
+    const skip = (page - 1) * limit;
+    let users;
+    let total;
+    if (type == "doctor") {
+      users = await doctorProfile
+        .find(query)
+        .sort({ [sort]: order === "desc" ? -1 : 1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+      total = await doctorProfile.countDocuments(query);
+    } else {
+      users = await patientProfile
+        .find(query)
+        .sort({ [sort]: order === "desc" ? -1 : 1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+      total = await patientProfile.countDocuments(query);
+    }
+
+    return sendResponse(res, 200, "Users retrieved successfully", users, {
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      pages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    return sendResponse(res, 500, error.message);
+  }
+};
+
 const getUserWithProfile = async (email) => {
   try {
     if (!email) throw new Error("Email is required.");
@@ -409,6 +493,7 @@ const sendOtpToPhoneNumber = async (phoneNumber) => {
 module.exports = {
   signUp,
   login,
+  adminLogin,
   updateUser,
   updateDp,
   getUser,
@@ -418,4 +503,6 @@ module.exports = {
   getUpdatedProfile,
   verifyOtp,
   resetPassword,
+
+  getAllUsers,
 };

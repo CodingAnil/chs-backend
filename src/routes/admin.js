@@ -1,5 +1,5 @@
 const express = require("express");
-const { login, forgotPassword, resetPassword } = require("../controllers/user");
+const { login, forgotPassword, resetPassword, getAllUsers, adminLogin } = require("../controllers/user");
 const {
   createProduct,
   getProducts,
@@ -11,7 +11,7 @@ const {
 const router = express.Router();
 
 // router.get("/plans", getPlans);
-router.post("/login", login);
+router.post("/login", adminLogin);
 router.post("/forgot-password", forgotPassword);
 router.put("/reset-password", resetPassword);
 
@@ -24,5 +24,8 @@ router.get("/product/:id", getProductById);
 router.put("/product/:id", updateProduct);
 router.delete("/product/:id", deleteProduct);
 router.patch("/product-status/:id", updateProductStatus);
+
+// get all users
+router.get("/all-users", getAllUsers);
 
 module.exports = router;

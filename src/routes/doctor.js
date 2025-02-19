@@ -20,6 +20,6 @@ router.get("/patient/:doctorId", getAllPatientsWithAppointmentDetails);
 router.get("/dashboard/:doctorId", getDoctorDashboardData);
 router.get("/clinic/:doctorId", getDoctorClinic);
 
-router.get("/list", checkAuth, getAllDoctors);
+router.get("/list", getAllDoctors);
 
 module.exports = router;

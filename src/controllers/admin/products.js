@@ -19,6 +19,7 @@ exports.getProducts = async (req, res) => {
       page = 1,
       limit = 10,
       search = "",
+      category="",
       sort = "createdAt",
       order = "desc",
     } = req.query;
@@ -28,6 +29,7 @@ exports.getProducts = async (req, res) => {
       $or: [
         { name: { $regex: search, $options: "i" } }, // Case-insensitive search for name
         { description: { $regex: search, $options: "i" } }, // Case-insensitive search for description
+        { category: { $regex: category, $options: "i" } },
       ],
     };
 
