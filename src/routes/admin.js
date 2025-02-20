@@ -1,5 +1,11 @@
 const express = require("express");
-const { login, forgotPassword, resetPassword, getAllUsers, adminLogin } = require("../controllers/user");
+const {
+  login,
+  forgotPassword,
+  resetPassword,
+  getAllUsers,
+  adminLogin,
+} = require("../controllers/user");
 const {
   createProduct,
   getProducts,
@@ -8,6 +14,7 @@ const {
   deleteProduct,
   updateProductStatus,
 } = require("../controllers/admin/products");
+const { setQueryType } = require("../middlewares/middle");
 const router = express.Router();
 
 // router.get("/plans", getPlans);
@@ -26,6 +33,7 @@ router.delete("/product/:id", deleteProduct);
 router.patch("/product-status/:id", updateProductStatus);
 
 // get all users
-router.get("/all-users", getAllUsers);
+router.get("/all-patients", setQueryType("patient"), getAllUsers);
+router.get("/all-doctors", setQueryType("doctor"), getAllUsers);
 
 module.exports = router;
