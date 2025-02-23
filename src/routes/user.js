@@ -11,6 +11,7 @@ const {
   getUpdatedProfile,
   verifyOtp,
   resetPassword,
+  deleteUserDp,
 } = require("../controllers/user");
 const { upload } = require("../middlewares/multerS3");
 const { checkAuth } = require("../middlewares/auth");
@@ -22,13 +23,15 @@ router.post("/forgot-password", forgotPassword);
 router.put("/verify-otp", verifyOtp);
 router.put("/reset-password", resetPassword);
 router.put("/update/:userId", updateUser);
+router.delete("/delete-dp/:userId", deleteUserDp);
+
 router.put(
   "/change-dp",
   checkAuth,
   // upload.single("dp"),
   updateDp
 );
-router.post("/upload-file",upload.single("file"), uploadFile);
+router.post("/upload-file", upload.single("file"), uploadFile);
 router.get("/", checkAuth, getUser);
 router.get("/:userId", getUpdatedProfile);
 

@@ -11,6 +11,7 @@ const PatientAppointment = require("../models/userAppointment");
 const PatientReports = require("../models/userReports");
 const PatientPrescription = require("../models/userPrescription");
 const symptomReport = require("../models/symptomReport");
+const HealthReport = require("../models/healthReport");
 
 const updateProfile = async (req, res) => {
   try {
@@ -614,6 +615,99 @@ const deleteSymptomReport = async (req, res) => {
   }
 };
 
+// health report
+
+const addOrUpdateReport = async (req, res) => {
+  try {
+    const {
+      heartRate,
+      bodyTemperature,
+      glucoseLevel,
+      spo2,
+      bloodPressure,
+      bmi,
+      lastVisit,
+    } = req.body;
+
+    if (!req.params.userId) {
+      return sendResponse(res, 400, "User ID is required");
+    }
+
+    const existingReport = await HealthReport.findOne({
+      userId: req.params.userId,
+    });
+
+    if (existingReport) {
+      // Update existing report
+      existingReport.heartRate = heartRate ?? existingReport.heartRate;
+      existingReport.bodyTemperature =
+        bodyTemperature ?? existingReport.bodyTemperature;
+      existingReport.glucoseLevel = glucoseLevel ?? existingReport.glucoseLevel;
+      existingReport.spo2 = spo2 ?? existingReport.spo2;
+      existingReport.bloodPressure =
+        bloodPressure ?? existingReport.bloodPressure;
+      existingReport.bmi = bmi ?? existingReport.bmi;
+
+      await existingReport.save();
+      return sendResponse(
+        res,
+        200,
+        "Health report updated successfully",
+        existingReport
+      );
+    } else {
+      // Create new report
+      const newReport = new HealthReport({
+        userId: req.params.userId,
+        heartRate,
+        bodyTemperature,
+        glucoseLevel,
+        spo2,
+        bloodPressure,
+        bmi,
+        lastVisit,
+      });
+
+      await newReport.save();
+      return sendResponse(
+        res,
+        201,
+        "Health report created successfully",
+        newReport
+      );
+    }
+  } catch (error) {
+    console.error("Error in addOrUpdateReport:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+const getHealthReport = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return sendResponse(res, 400, "User ID is required");
+    }
+
+    const healthReport = await HealthReport.findOne({ userId: userId });
+
+    if (!healthReport) {
+      return sendResponse(res, 404, "No health report found for this user", {});
+    }
+
+    return sendResponse(
+      res,
+      200,
+      "Health report retrieved successfully",
+      healthReport
+    );
+  } catch (error) {
+    console.error("Error in getHealthReport:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
   updateProfile,
   createAppointment,
@@ -637,4 +731,6 @@ module.exports = {
   getSymptomReports,
   deleteSymptomReport,
   getComAppointments,
+  addOrUpdateReport,
+  getHealthReport,
 };

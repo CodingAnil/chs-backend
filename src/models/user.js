@@ -25,13 +25,17 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
+    fileKey: {
+      type: String,
+      default: null,
+    },
     coverImage: {
       type: String,
       default: null,
     },
     role: {
       type: String,
-      enum: ["Patient", "Doctor", "Pharmacy retailers","Admin"],
+      enum: ["Patient", "Doctor", "Pharmacy retailers", "Admin"],
       default: "Patient",
     },
     profile: {

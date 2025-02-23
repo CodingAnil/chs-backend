@@ -26,6 +26,8 @@ const {
   addReportAttachment,
   addPrescriptionAttachment,
   getComAppointments,
+  addOrUpdateReport,
+  getHealthReport,
 } = require("../controllers/patient");
 const { generateSymptomSummary } = require("../controllers/symptoms");
 
@@ -66,5 +68,8 @@ router.post("/symptom-checker", generateSymptomSummary);
 router.post("/save-checked-symptom/:patientId", saveSymptomReport);
 router.get("/reports/:patientId", getSymptomReports);
 router.delete("/report/:id", deleteSymptomReport);
+
+router.put("/update-health-report/:userId", addOrUpdateReport);
+router.get("/health-report/:userId", getHealthReport);
 
 module.exports = router;

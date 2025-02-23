@@ -1,4 +1,5 @@
 const { FRONTEND_URL } = require("../configs");
+const { deleteS3File } = require("../configs/s3");
 const sendSms = require("../configs/sendSms");
 const doctorProfile = require("../models/doctorProfile");
 const patientProfile = require("../models/patientProfile");
@@ -206,7 +207,15 @@ const updateUser = async (req, res) => {
 
     const updateFields = {};
 
-    const { password, oldPassword, role, profile, notification } = req.body;
+    const {
+      password,
+      oldPassword,
+      coverImage,
+      fileKey,
+      role,
+      profile,
+      notification,
+    } = req.body;
 
     if (profile) updateFields.profile = profile;
     if (typeof notification !== "undefined")
@@ -241,6 +250,11 @@ const updateUser = async (req, res) => {
 
     if (role) {
       updateFields.role = capitalizeFirstLetter(role);
+    }
+
+    if (coverImage) {
+      updateFields.coverImage = coverImage;
+      updateFields.fileKey = fileKey;
     }
 
     // Update the user with only the provided fields
@@ -355,6 +369,50 @@ const getUpdatedProfile = async (req, res) => {
   } catch (error) {
     console.error(error);
     return sendResponse(res, 500, error.message);
+  }
+};
+
+const deleteUserDp = async (req, res) => {
+  try {
+    const userId = req.params?.userId;
+    if (!userId) {
+      return sendResponse(res, 400, "User ID is required");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return sendResponse(res, 404, "User not found");
+    }
+
+    // Check if the user has a fileKey before attempting to delete
+    if (user.fileKey) {
+      try {
+        await deleteS3File(user.fileKey);
+      } catch (err) {
+        console.error("Error deleting file from S3:", err);
+        return sendResponse(
+          res,
+          500,
+          "Failed to delete profile picture from storage."
+        );
+      }
+    }
+
+    // Update user profile by removing the cover image and file key
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { coverImage: null, fileKey: null },
+      { new: true }
+    );
+
+    return sendResponse(
+      res,
+      200,
+      "User profile picture deleted successfully",
+      updatedUser
+    );
+  } catch (error) {
+    return handleingError(res, error);
   }
 };
 
@@ -496,6 +554,7 @@ module.exports = {
   adminLogin,
   updateUser,
   updateDp,
+  deleteUserDp,
   getUser,
   forgotPassword,
   userEmialVerify,
