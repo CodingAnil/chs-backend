@@ -319,13 +319,18 @@ const login = async (req, res) => {
 
 const adminLogin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, phoneNumber, password } = req.body;
 
-    if (!password || !(name || email)) {
-      return sendResponse(res, 400, "Name/Email and Password are required!");
+    if ( !phoneNumber) {
+      return sendResponse(res, 400, "PhoneNumber is required!");
+    }
+    if (!password) {
+      return sendResponse(res, 400, "Password is required!");
     }
 
-    const user = await User.findOne({ $or: [{ name }, { email }] });
+    const user = await User.findOne({
+      $or: [{ name }, { email }, { phoneNumber }],
+    });
     if (!user || user.role !== "Admin") {
       return sendResponse(
         res,
