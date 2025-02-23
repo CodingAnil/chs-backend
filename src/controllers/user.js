@@ -143,12 +143,14 @@ const verifyOtp = async (req, res) => {
   try {
     const { phoneNumber, otp } = req.body;
 
-    const userOtp = await UserOtp.findOne({ phoneNumber });
+    const userOtp = await UserOtp.find({ phoneNumber });
     if (!userOtp) {
       return sendResponse(res, 400, "No otp found ");
     }
 
-    if (userOtp?.otp !== otp || userOtp?.otpExpiry < Date.now()) {
+    const otps = userOtp.map((e) => e.otp);
+
+    if (!otps.includes(otp)) {
       return sendResponse(res, 400, "Invalid or expired OTP");
     }
 
