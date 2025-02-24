@@ -12,6 +12,7 @@ const {
   getAllPatientsWithAppointmentDetails,
   getAppointmentsCountForAllStatuses,
 } = require("../controllers/doctor");
+const { analyzePatientReport } = require("../controllers/symptoms");
 
 router.put("/:userId", checkAuth, updateProfile);
 router.get("/appointment-count/:doctorId", getAppointmentsCountForAllStatuses);
@@ -21,5 +22,7 @@ router.get("/dashboard/:doctorId", getDoctorDashboardData);
 router.get("/clinic/:doctorId", getDoctorClinic);
 
 router.get("/list", getAllDoctors);
+
+router.post("/symptom-analyser", analyzePatientReport);
 
 module.exports = router;
