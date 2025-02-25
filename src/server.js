@@ -51,7 +51,7 @@ global.io.on("connection", (socket) => {
 app.get("/", (req, res) => {
   return res.status(200).json({
     success: true,
-    message: "Api is running",
+    message: "CHS Health Apis Is Running",
   });
 });
 
