@@ -266,9 +266,9 @@ const getAllPatientAppointment = async (req, res) => {
       .populate("patientId")
       .exec();
 
-    if (Appointments && Appointments?.length > 0) {
-      Appointments = await getWithProfileImg(Appointments);
-    }
+    // if (Appointments && Appointments?.length > 0) {
+    //   Appointments = await getWithProfileImg(Appointments);
+    // }
 
     return sendResponse(
       res,
@@ -285,6 +285,7 @@ const getWithProfileImg = async (appointments) => {
   try {
     const newAppointments = await Promise.all(
       appointments.map(async (it) => {
+        console.log(it,"ittttt")
         const user = await User.findOne({ profile: it?.patientId?._id }); // Use `_id` from populated patientId
         return {
           ...it._doc,
