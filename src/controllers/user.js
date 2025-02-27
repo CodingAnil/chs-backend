@@ -470,7 +470,7 @@ const getUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const {
-      page = 1,
+      currentPage = 1,
       limit = 10,
       search = "",
       type = "patient",
@@ -486,7 +486,7 @@ const getAllUsers = async (req, res) => {
     };
 
     // Pagination and sorting
-    const skip = (page - 1) * limit;
+    const skip = (currentPage - 1) * limit;
     let users;
     let total;
     if (type == "doctor") {
@@ -507,7 +507,7 @@ const getAllUsers = async (req, res) => {
 
     return sendResponse(res, 200, "Users retrieved successfully", users, {
       total,
-      page: parseInt(page),
+      page: parseInt(currentPage),
       limit: parseInt(limit),
       pages: Math.ceil(total / limit),
     });
