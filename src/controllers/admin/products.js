@@ -19,19 +19,24 @@ exports.getProducts = async (req, res) => {
       page = 1,
       limit = 10,
       search = "",
-      category="",
+      category = "",
       sort = "createdAt",
       order = "desc",
     } = req.query;
 
-    // Search products by name or description
-    const query = {
-      $or: [
+    // Create search query
+    let query = {};
+
+    if (search) {
+      query.$or = [
         { name: { $regex: search, $options: "i" } }, // Case-insensitive search for name
         { description: { $regex: search, $options: "i" } }, // Case-insensitive search for description
-        { category: { $regex: category, $options: "i" } },
-      ],
-    };
+      ];
+    }
+
+    if (category) {
+      query.category = category; // Exact match for category
+    }
 
     // Pagination and sorting
     const skip = (page - 1) * limit;

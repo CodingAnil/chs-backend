@@ -77,7 +77,7 @@ const signUp = async (req, res) => {
 
     await sendOtpToPhoneNumber(phoneNumber);
 
-    const user = await getUserWithProfile(newUser?.email);
+    const user = await getUserWithProfile(newUser?._id);
 
     return sendResponse(
       res,
@@ -132,7 +132,7 @@ const resetPassword = async (req, res) => {
       res,
       200,
       "Password reset successfully",
-      getUserWithProfile(user?.email)
+      getUserWithProfile(user?._id)
     );
   } catch (error) {
     return sendResponse(res, 500, error.message);
@@ -164,7 +164,7 @@ const verifyOtp = async (req, res) => {
       res,
       200,
       "OTP verified successfully",
-      getUserWithProfile(user?.email)
+      getUserWithProfile(user?._id)
     );
   } catch (error) {
     return sendResponse(res, 500, error.message);
@@ -178,7 +178,7 @@ const userEmialVerify = async (req, res) => {
     if (!user) {
       return sendResponse(res, 404, "User not found");
     }
-    const userDetails = await getUserWithProfile(user.email);
+    const userDetails = await getUserWithProfile(user._id);
 
     return sendResponse(
       res,
@@ -268,7 +268,7 @@ const updateUser = async (req, res) => {
       return sendResponse(res, 404, "User not found");
     }
 
-    const userDetails = await getUserWithProfile(updatedUser.email);
+    const userDetails = await getUserWithProfile(updatedUser._id);
     return sendResponse(
       res,
       200,
@@ -303,7 +303,7 @@ const login = async (req, res) => {
       return sendResponse(res, 400, "Incorrect password.");
     }
 
-    user = await getUserWithProfile(user?.email);
+    user = await getUserWithProfile(user?._id);
 
     const token = generateToken(user);
 
@@ -343,7 +343,7 @@ const adminLogin = async (req, res) => {
       return sendResponse(res, 400, "Incorrect password.");
     }
 
-    const userProfile = await getUserWithProfile(user.email);
+    const userProfile = await getUserWithProfile(user._id);
     const accessToken = generateToken(userProfile);
 
     return sendResponse(res, 200, "Login successful", {
@@ -365,7 +365,7 @@ const getUpdatedProfile = async (req, res) => {
       return sendResponse(res, 400, "This account does not exist.");
     }
 
-    user = await getUserWithProfile(user?.email);
+    user = await getUserWithProfile(user?._id);
 
     const token = generateToken(user);
 
@@ -437,7 +437,7 @@ const updateDp = async (req, res) => {
     }
     await user.save();
 
-    user = await getUserWithProfile(user?.email);
+    user = await getUserWithProfile(user?._id);
 
     return sendResponse(
       res,
@@ -458,7 +458,7 @@ const getUser = async (req, res) => {
       return sendResponse(res, 404, "User not found");
     }
 
-    user = await getUserWithProfile(user?.email);
+    user = await getUserWithProfile(user?._id);
 
     return sendResponse(res, 200, "User Detail getting successfully", user);
   } catch (error) {
@@ -516,11 +516,11 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const getUserWithProfile = async (email) => {
+const getUserWithProfile = async (id) => {
   try {
-    if (!email) throw new Error("Email is required.");
+    if (!id) throw new Error("User id is required.");
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ _id: id });
     if (!user) return null;
 
     ({ password, notification, ...withoutSensitiveInfo } = user.toObject());

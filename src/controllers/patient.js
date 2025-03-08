@@ -70,9 +70,14 @@ const updateProfile = async (req, res) => {
       updateFields.address = address;
       updateUserFields.address = address;
     }
-    if (email) {
-      updateFields.email = email?.toLowerCase();
-      updateUserFields.email = email?.toLowerCase();
+    if (email !== undefined) {
+      // if (email === "") {
+      //   updateFields.email = null;
+      //   updateUserFields.email = null;
+      // } else {
+        updateFields.email = email.toLowerCase();
+        updateUserFields.email = email.toLowerCase();
+      // }
     }
     if (updateUserFields && Object?.keys(updateUserFields)?.length > 0) {
       await User.findByIdAndUpdate(user?._id, updateUserFields, {

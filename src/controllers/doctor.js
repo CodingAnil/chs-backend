@@ -46,7 +46,11 @@ const updateProfile = async (req, res) => {
     if (country) updateFields.country = country;
     if (languages) updateFields.languages = languages;
     if (lastName) updateFields.lastName = lastName;
-    if (displayName) updateFields.displayName = displayName;
+    if (displayName) {
+      updateFields.displayName = displayName;
+    } else if (displayName === "") {
+      updateFields.displayName = null;
+    }
     if (designation)
       updateFields.designation = capitalizeFirstLetter(designation);
     updateFields.availability = availability || false;
@@ -62,7 +66,12 @@ const updateProfile = async (req, res) => {
     if (email) {
       updateFields.email = email?.toLowerCase();
       updateUserFields.email = email?.toLowerCase();
-    }
+    } 
+    // else if (email === "") {
+    //   updateFields.email = null;
+    //   updateUserFields.email = null;
+    // }
+
     if (updateUserFields && Object?.keys(updateUserFields)?.length > 0) {
       await User.findByIdAndUpdate(user?._id, updateUserFields, {
         new: true,
@@ -139,8 +148,9 @@ const getDoctorDashboardData = async (req, res) => {
     const lastUpcomingAppointment = await PatientAppointment.findOne({
       refDoctor: doctorId,
       date: { $gte: new Date() },
+      status: { $in: ["Pending", "Accepted"] },
     })
-      .sort({ date: 1 })
+      .sort({ date: -1 })
       .populate("patientId");
 
     // Query for yesterday's data for percentage analysis
@@ -285,7 +295,6 @@ const getWithProfileImg = async (appointments) => {
   try {
     const newAppointments = await Promise.all(
       appointments.map(async (it) => {
-        console.log(it,"ittttt")
         const user = await User.findOne({ profile: it?.patientId?._id }); // Use `_id` from populated patientId
         return {
           ...it._doc,

@@ -5,20 +5,47 @@ const { sendResponse } = require("../utils");
 
 const generateSymptomSummary = async (req, res) => {
   try {
-    const { symptoms, age, height, weight } = req.body;
-    console.log("Received data:", req.body);
-
-    if (!symptoms || !age || !height || !weight) {
-      return res.status(400).json({
-        message: "All fields (symptoms, age, height, weight) are required.",
-      });
-    }
-
-    const formattedPrompt = await symptomPrompt.format({
+    const {
       symptoms,
       age,
       height,
       weight,
+      gender,
+      bloodPressure,    // Optional
+      heartRate,       // Optional
+      bodyTemperature, // Optional
+      spo2,            // Optional
+    } = req.body;
+    console.log("Received data:", req.body);
+
+    // Check if required fields are present
+    if (!symptoms || !age || !height || !weight || !gender) {
+      return res.status(400).json({
+        message: "All fields (symptoms, age, height, weight, gender) are required.",
+      });
+    }
+
+    // Pre-format optional fields with conditional logic
+    const bloodPressureInfo = bloodPressure ? `Blood pressure: ${bloodPressure}.` : "";
+    const heartRateInfo = heartRate ? `Heart rate: ${heartRate} beats per minute.` : "";
+    const bodyTemperatureInfo = bodyTemperature ? `Body temperature: ${bodyTemperature}°C.` : "";
+    const spo2Info = spo2 ? `SpO2: ${spo2}%.` : "";
+
+    // Format the prompt with provided data
+    await symptomPrompt.format({
+      symptoms,
+      age,
+      height,
+      weight,
+      gender,
+      bloodPressureInfo,    // Pre-formatted
+      heartRateInfo,        // Pre-formatted
+      bodyTemperatureInfo,  // Pre-formatted
+      spo2Info,             // Pre-formatted
+      bloodPressure: bloodPressure || "Not provided", // For analysis
+      heartRate: heartRate || "Not provided",         // For analysis
+      bodyTemperature: bodyTemperature || "Not provided", // For analysis
+      spo2: spo2 || "Not provided",                   // For analysis
     });
 
     const outputParser = new StringOutputParser();
@@ -31,6 +58,15 @@ const generateSymptomSummary = async (req, res) => {
       age,
       height,
       weight,
+      gender,
+      bloodPressureInfo,
+      heartRateInfo,
+      bodyTemperatureInfo,
+      spo2Info,
+      bloodPressure: bloodPressure || "Not provided",
+      heartRate: heartRate || "Not provided",
+      bodyTemperature: bodyTemperature || "Not provided",
+      spo2: spo2 || "Not provided",
     })) {
       summary += chunk;
       global.io.emit("summary", { summary });
@@ -44,15 +80,12 @@ const generateSymptomSummary = async (req, res) => {
   } catch (error) {
     console.error("Error in generateSymptomSummary:", error);
     if (!res.headersSent) {
-      return sendResponse(
-        res,
-        500,
-        "An error occurred while generating the symptom report."
-      );
+      return res.status(500).json({
+        message: "An error occurred while generating the symptom report.",
+      });
     }
   }
 };
-
 const analyzePatientReport = async (req, res) => {
   try {
     const { patientReport, reportId } = req.body;
@@ -99,11 +132,9 @@ const analyzePatientReport = async (req, res) => {
   } catch (error) {
     console.error("Error in analyzePatientReport:", error);
     if (!res.headersSent) {
-      return res
-        .status(500)
-        .json({
-          message: "An error occurred while analyzing the patient report.",
-        });
+      return res.status(500).json({
+        message: "An error occurred while analyzing the patient report.",
+      });
     }
   }
 };
