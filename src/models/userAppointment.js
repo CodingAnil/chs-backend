@@ -55,6 +55,10 @@ const appointmentSchema = new Schema(
       type: String,
       default: null,
     },
+    fileKey: {
+      type: String,
+      default: null,
+    },
     appointmentPersonName: {
       type: String,
       default: null,

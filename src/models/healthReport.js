@@ -32,6 +32,18 @@ const healthReportSchema = new Schema(
       type: Number,
       default: null,
     },
+    healthFile: {
+      type: String,
+      default: null,
+    },
+    fileKey: {
+      type: String,
+      default: null,
+    },
+    fileName: {
+      type: String,
+      default: null,
+    },
     updatedAt: {
       type: Date,
       default: Date.now,

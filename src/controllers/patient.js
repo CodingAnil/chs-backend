@@ -75,8 +75,8 @@ const updateProfile = async (req, res) => {
       //   updateFields.email = null;
       //   updateUserFields.email = null;
       // } else {
-        updateFields.email = email.toLowerCase();
-        updateUserFields.email = email.toLowerCase();
+      updateFields.email = email.toLowerCase();
+      updateUserFields.email = email.toLowerCase();
       // }
     }
     if (updateUserFields && Object?.keys(updateUserFields)?.length > 0) {
@@ -622,65 +622,95 @@ const deleteSymptomReport = async (req, res) => {
 
 // health report
 
+// const addOrUpdateReport = async (req, res) => {
+//   try {
+//     const {
+//       heartRate,
+//       bodyTemperature,
+//       glucoseLevel,
+//       spo2,
+//       bloodPressure,
+//       bmi,
+//       lastVisit,
+//     } = req.body;
+
+//     if (!req.params.userId) {
+//       return sendResponse(res, 400, "User ID is required");
+//     }
+
+//     const existingReport = await HealthReport.findOne({
+//       userId: req.params.userId,
+//     });
+
+//     if (existingReport) {
+//       // Update existing report
+//       existingReport.heartRate = heartRate ?? existingReport.heartRate;
+//       existingReport.bodyTemperature =
+//         bodyTemperature ?? existingReport.bodyTemperature;
+//       existingReport.glucoseLevel = glucoseLevel ?? existingReport.glucoseLevel;
+//       existingReport.spo2 = spo2 ?? existingReport.spo2;
+//       existingReport.bloodPressure =
+//         bloodPressure ?? existingReport.bloodPressure;
+//       existingReport.bmi = bmi ?? existingReport.bmi;
+
+//       await existingReport.save();
+//       return sendResponse(
+//         res,
+//         200,
+//         "Health report updated successfully",
+//         existingReport
+//       );
+//     } else {
+//       // Create new report
+//       const newReport = new HealthReport({
+//         userId: req.params.userId,
+//         heartRate,
+//         bodyTemperature,
+//         glucoseLevel,
+//         spo2,
+//         bloodPressure,
+//         bmi,
+//         lastVisit,
+//       });
+
+//       await newReport.save();
+//       return sendResponse(
+//         res,
+//         201,
+//         "Health report created successfully",
+//         newReport
+//       );
+//     }
+//   } catch (error) {
+//     console.error("Error in addOrUpdateReport:", error);
+//     return sendResponse(res, 500, error.message);
+//   }
+// };
+
 const addOrUpdateReport = async (req, res) => {
   try {
-    const {
-      heartRate,
-      bodyTemperature,
-      glucoseLevel,
-      spo2,
-      bloodPressure,
-      bmi,
-      lastVisit,
-    } = req.body;
+    const { healthFile, fileKey, fileName } = req.body;
+    const { userId } = req.params;
 
-    if (!req.params.userId) {
+    if (!userId) {
       return sendResponse(res, 400, "User ID is required");
     }
 
-    const existingReport = await HealthReport.findOne({
-      userId: req.params.userId,
-    });
+    // ✅ Find and update or create new
+    const existingReport = await HealthReport.findOneAndUpdate(
+      { userId }, // Find report by userId
+      { healthFile, fileKey, fileName }, // Update these fields
+      { new: true, upsert: true } // Create if not found (upsert)
+    );
 
-    if (existingReport) {
-      // Update existing report
-      existingReport.heartRate = heartRate ?? existingReport.heartRate;
-      existingReport.bodyTemperature =
-        bodyTemperature ?? existingReport.bodyTemperature;
-      existingReport.glucoseLevel = glucoseLevel ?? existingReport.glucoseLevel;
-      existingReport.spo2 = spo2 ?? existingReport.spo2;
-      existingReport.bloodPressure =
-        bloodPressure ?? existingReport.bloodPressure;
-      existingReport.bmi = bmi ?? existingReport.bmi;
-
-      await existingReport.save();
-      return sendResponse(
-        res,
-        200,
-        "Health report updated successfully",
-        existingReport
-      );
-    } else {
-      // Create new report
-      const newReport = new HealthReport({
-        userId: req.params.userId,
-        heartRate,
-        bodyTemperature,
-        glucoseLevel,
-        spo2,
-        bloodPressure,
-        bmi,
-        lastVisit,
-      });
-
-      await newReport.save();
-      return sendResponse(
-        res,
-        201,
-        "Health report created successfully",
-        newReport
-      );
-    }
+    return sendResponse(
+      res,
+      200,
+      existingReport
+        ? "Health report updated successfully"
+        : "Health report created successfully",
+      existingReport
+    );
   } catch (error) {
     console.error("Error in addOrUpdateReport:", error);
     return sendResponse(res, 500, error.message);

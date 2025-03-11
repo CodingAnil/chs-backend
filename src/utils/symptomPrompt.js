@@ -7,7 +7,7 @@ When a user provides symptoms, along with their age, height (in cm), and weight 
 Use the following format and include detailed explanations for each section. Ensure the report is informative and thorough, like something a doctor would appreciate and a patient can easily understand.
 
 ## Report
-- **Patient Information**: The patient is {age} years old, with a height of {height} cm and a weight of {weight} kg. {bloodPressureInfo} {heartRateInfo} {bodyTemperatureInfo} {spo2Info}
+- **Patient Information**: The patient is {age} years old, with a height of {height} cm and a weight of {weight} kg.
 - **Symptoms Provided**: The patient reports experiencing {symptoms}.
 - **Detailed Analysis**: Explain what could be causing these symptoms, providing an overview of the physiological mechanisms or common conditions related to them. If optional vital signs (blood pressure: {bloodPressure}, heart rate: {heartRate}, body temperature: {bodyTemperature}, SpO2: {spo2}) are provided (i.e., not "Not provided"), incorporate them into the analysis to refine the explanation.
 - **Potential Diagnoses**: Provide at least 3 possible diagnoses based on the symptoms and any provided vital signs. Explain why each diagnosis could be relevant, referencing typical symptoms, conditions, and vital signs (if available).
