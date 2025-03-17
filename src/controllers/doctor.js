@@ -2,6 +2,7 @@ const doctorProfile = require("../models/doctorProfile");
 const User = require("../models/user");
 const PatientAppointment = require("../models/userAppointment");
 const DoctorClinic = require("../models/doctorClinc");
+const twilio = require("twilio");
 
 const {
   sendResponse,
@@ -66,7 +67,7 @@ const updateProfile = async (req, res) => {
     if (email) {
       updateFields.email = email?.toLowerCase();
       updateUserFields.email = email?.toLowerCase();
-    } 
+    }
     // else if (email === "") {
     //   updateFields.email = null;
     //   updateUserFields.email = null;

@@ -12,6 +12,7 @@ const {
   patientRoutes,
   doctorRoutes,
   adminRoutes,
+  contactRoutes,
 } = require("./routes/index.js");
 
 const app = express();
@@ -28,8 +29,9 @@ app.use("/user", userRoutes);
 app.use("/patient", patientRoutes);
 app.use("/doctor", doctorRoutes);
 app.use("/admin", adminRoutes);
+app.use("/contact", contactRoutes);
+app.use("/api", contactRoutes);
 
-// app.use("/content", modelContentRoutes);
 // app.use("/interaction", interactionRoutes);
 // app.use("/chat", chatRoutes);
 // app.use("/payment", paymentRoutes);
