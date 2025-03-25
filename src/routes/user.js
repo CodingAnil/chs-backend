@@ -21,6 +21,11 @@ const {
   updateCartItem,
   deleteCartItem,
   getAllCartItems,
+  saveAddress,
+  getUserAddresses,
+  deleteAddress,
+  savePayment,
+  getUserPayments,
 } = require("../controllers/cartController");
 
 router.post("/register", signUp);
@@ -46,5 +51,15 @@ router.post("/cart/:userId", addProductToCart); // Add product to cart
 router.put("/cart/:userId/:productId", updateCartItem); // Update product quantity
 router.delete("/cart/:userId/:productId", deleteCartItem); // Delete product from cart
 router.get("/cart/:userId", getAllCartItems); // Get all cart items for a user
+
+
+// Address Endpoints
+router.post("/address", saveAddress);
+router.get("/address/:userId", getUserAddresses);
+router.delete("/address/:userId/:addressId", deleteAddress);
+
+// Payment Endpoints
+router.post("/payment", savePayment);
+router.get("/payment/:userId", getUserPayments);
 
 module.exports = router;

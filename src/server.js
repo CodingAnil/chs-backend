@@ -12,6 +12,7 @@ const {
   patientRoutes,
   doctorRoutes,
   adminRoutes,
+  paymentRoutes,
 } = require("./routes/index.js");
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/uploads", express.static("uploads"));
 
 // routes
 app.use("/user", userRoutes);
+app.use("/payment", paymentRoutes);
 app.use("/patient", patientRoutes);
 app.use("/doctor", doctorRoutes);
 app.use("/admin", adminRoutes);
