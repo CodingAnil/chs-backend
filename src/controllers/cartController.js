@@ -101,47 +101,89 @@ const getAllCartItems = async (req, res) => {
 // Save Address
 const saveAddress = async (req, res) => {
   try {
-    const { userId, firstName, lastName, email, phone, address } = req.body;
+    const {
+      userId,
+      name,
+      mobileNo,
+      email,
+      city,
+      pincode,
+      state,
+      houseNumber,
+      landmark,
+      type,
+    } = req.body;
+
+    // Validate required fields
+    if (!userId || !name || !mobileNo || !city || !pincode || !state || !houseNumber || !type) {
+      return sendResponse(res, 400, "All required fields must be provided.");
+    }
 
     const newAddress = new Address({
       userId,
-      firstName,
-      lastName,
+      name,
+      mobileNo,
       email,
-      phone,
-      address,
+      city,
+      pincode,
+      state,
+      houseNumber,
+      landmark,
+      type,
     });
 
     await newAddress.save();
     return sendResponse(res, 201, "Address saved successfully", newAddress);
   } catch (error) {
-    console.error(error);
+    console.error("Failed to save address:", error);
     sendResponse(res, 500, error.message);
   }
 };
+
 
 // Get all addresses for a user
 const getUserAddresses = async (req, res) => {
   try {
     const { userId } = req.params;
+    if (!userId) {
+      return sendResponse(res, 400, "User ID is required.");
+    }
+
     const addresses = await Address.find({ userId });
+
+    if (!addresses.length) {
+      return sendResponse(res, 404, "No addresses found.");
+    }
 
     return sendResponse(res, 200, "Addresses fetched successfully", addresses);
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch addresses:", error);
     sendResponse(res, 500, error.message);
   }
 };
+
 
 // Delete Address
 const deleteAddress = async (req, res) => {
   try {
     const { userId, addressId } = req.params;
-    await Address.findOneAndDelete({ _id: addressId, userId });
+
+    if (!userId || !addressId) {
+      return sendResponse(res, 400, "User ID and Address ID are required.");
+    }
+
+    const deletedAddress = await Address.findOneAndDelete({
+      _id: addressId,
+      userId,
+    });
+
+    if (!deletedAddress) {
+      return sendResponse(res, 404, "Address not found.");
+    }
 
     return sendResponse(res, 200, "Address deleted successfully");
   } catch (error) {
-    console.error(error);
+    console.error("Failed to delete address:", error);
     sendResponse(res, 500, error.message);
   }
 };
