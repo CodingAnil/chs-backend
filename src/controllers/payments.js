@@ -26,7 +26,7 @@ const verifyPayment = async (req, res) => {
     req.body;
 
   const crypto = require("crypto");
-  const hmac = crypto.createHmac("sha256", RAZORPAY_KEY_SECRET);
+  const hmac = crypto.createHmac("sha256", "ntaN5SWwb05l5DYioUHKbvF3");
   hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
   const digest = hmac.digest("hex");
 
