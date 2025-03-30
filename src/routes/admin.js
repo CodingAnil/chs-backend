@@ -13,9 +13,16 @@ const {
   updateProduct,
   deleteProduct,
   updateProductStatus,
-  createContact,
 } = require("../controllers/admin/products");
 const { setQueryType } = require("../middlewares/middle");
+const {
+  createApplication,
+  getAllApplications,
+  getApplicationById,
+  updateApplication,
+  createContact,
+} = require("../controllers/admin/feedback");
+
 const router = express.Router();
 
 // router.get("/plans", getPlans);
@@ -37,7 +44,13 @@ router.patch("/product-status/:id", updateProductStatus);
 router.get("/all-patients", setQueryType("patient"), getAllUsers);
 router.get("/all-doctors", setQueryType("doctor"), getAllUsers);
 
+// contact us
 router.post("/contact", createContact);
 
+//  Apply for Team
+router.post("/apply", createApplication);
+router.get("/applications", getAllApplications);
+router.get("/applications/:id", getApplicationById);
+router.put("/applications/:id", updateApplication);
 
 module.exports = router;

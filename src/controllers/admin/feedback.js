@@ -1,17 +1,38 @@
-const ContactUs = require("../../models/clientFeedback");
+const ContactUs = require("../../models/contactus");
+const TeamApplication = require("../../models/teamAplication");
+
 const { sendResponse } = require("../../utils");
 
 // 1. Add new feedback
-async function addFeedback(req, res) {
+const createContact = async (req, res) => {
+  const { name, email, phone, services, message ,userId } = req.body;
+
   try {
-    const feedback = new ContactUs(req.body);
-    const result = await feedback.save();
-    return sendResponse(res, 200, "Feedback submitted successfully.", result);
+    // Store in MongoDB
+    const newContact = new ContactUs({
+      name,
+      email,
+      phone,
+      services,
+      message,
+      userId
+    });
+
+    await newContact.save();
+
+    // Email configuration
+
+    return sendResponse(
+      res,
+      201,
+      "Contact form submitted successfully!",
+      newContact
+    );
   } catch (error) {
-    console.error("Error adding feedback:", error);
+    console.error("Error:", error);
     return sendResponse(res, 500, error.message);
   }
-}
+};
 
 // 2. Get all feedbacks
 async function getAllFeedbacks(req, res) {
@@ -121,10 +142,105 @@ async function deleteFeedback(req, res) {
   }
 }
 
+// ✅ 1. Create Application
+const createApplication = async (req, res) => {
+  const { name, phone, email, experience, designation, message, resumeUrl,resumeKey,userId } =
+    req.body;
+
+  try {
+    const newApplication = new TeamApplication({
+      name,
+      phone,
+      email,
+      experience,
+      designation,
+      message,
+      resumeUrl,
+      resumeKey,
+      userId
+    });
+
+    await newApplication.save();
+    return sendResponse(
+      res,
+      201,
+      "Application submitted successfully!",
+      newApplication
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+// ✅ 2. Get All Applications
+const getAllApplications = async (req, res) => {
+  try {
+    const applications = await TeamApplication.find();
+    return sendResponse(
+      res,
+      200,
+      "Application fetched successfully!",
+      applications
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+// ✅ 3. Get Application by ID
+const getApplicationById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const application = await TeamApplication.findById(id);
+    if (!application) {
+      return sendResponse(res, 404, "Application not found");
+    }
+    return sendResponse(res, 200, "Application fetched", application);
+  } catch (error) {
+    console.error("Error:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+// ✅ 4. Update Application (Status or Details)
+const updateApplication = async (req, res) => {
+  const { id } = req.params;
+  const { status, ...updateData } = req.body;
+
+  try {
+    const updatedApplication = await TeamApplication.findByIdAndUpdate(
+      id,
+      { $set: { ...updateData, status } },
+      { new: true }
+    );
+
+    if (!updatedApplication) {
+      return sendResponse(res, 404, "Application not found");
+    }
+
+    return sendResponse(
+      res,
+      200,
+      "Application updated successfully",
+      updatedApplication
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
 module.exports = {
-  addFeedback,
+  createContact,
   getAllFeedbacks,
   getFeedbacksByUserId,
   updateFeedback,
   deleteFeedback,
+  createApplication,
+  getAllApplications,
+  getApplicationById,
+  updateApplication,
 };
