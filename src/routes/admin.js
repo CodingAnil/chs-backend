@@ -13,6 +13,7 @@ const {
   updateProduct,
   deleteProduct,
   updateProductStatus,
+  createContact,
 } = require("../controllers/admin/products");
 const { setQueryType } = require("../middlewares/middle");
 const router = express.Router();
@@ -35,5 +36,8 @@ router.patch("/product-status/:id", updateProductStatus);
 // get all users
 router.get("/all-patients", setQueryType("patient"), getAllUsers);
 router.get("/all-doctors", setQueryType("doctor"), getAllUsers);
+
+router.post("/contact", createContact);
+
 
 module.exports = router;

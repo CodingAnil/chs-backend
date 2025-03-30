@@ -1,5 +1,6 @@
 const { sendResponse } = require("../../utils");
 const Product = require("../../models/products");
+const Contact = require("../../models/contactus");
 
 // Create a new product
 exports.createProduct = async (req, res) => {
@@ -124,6 +125,36 @@ exports.updateProductStatus = async (req, res) => {
 
     return sendResponse(res, 200, "Status updated successfully", product);
   } catch (error) {
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+exports.createContact = async (req, res) => {
+  const { name, email, phone, services, message ,userId } = req.body;
+
+  try {
+    // Store in MongoDB
+    const newContact = new Contact({
+      name,
+      email,
+      phone,
+      services,
+      message,
+      userId
+    });
+
+    await newContact.save();
+
+    // Email configuration
+
+    return sendResponse(
+      res,
+      201,
+      "Contact form submitted successfully!",
+      newContact
+    );
+  } catch (error) {
+    console.error("Error:", error);
     return sendResponse(res, 500, error.message);
   }
 };
