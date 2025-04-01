@@ -28,6 +28,22 @@ const symptomReportSchema = new Schema(
       type: String,
       default: null,
     },
+    bloodPressure: {
+      type: String,
+      default: null,
+    },
+    heartRate: {
+      type: String,
+      default: null,
+    },
+    bodyTemperature: {
+      type: String,
+      default: null,
+    },
+    spo2: {
+      type: String,
+      default: null,
+    },
     updatedAt: {
       type: Date,
       default: Date.now,

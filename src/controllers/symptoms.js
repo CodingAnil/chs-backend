@@ -42,10 +42,10 @@ const generateSymptomSummary = async (req, res) => {
       heartRateInfo,        // Pre-formatted
       bodyTemperatureInfo,  // Pre-formatted
       spo2Info,             // Pre-formatted
-      bloodPressure: bloodPressure || "Not provided", // For analysis
-      heartRate: heartRate || "Not provided",         // For analysis
-      bodyTemperature: bodyTemperature || "Not provided", // For analysis
-      spo2: spo2 || "Not provided",                   // For analysis
+      bloodPressure: bloodPressure || "", // For analysis
+      heartRate: heartRate || "",         // For analysis
+      bodyTemperature: bodyTemperature || "", // For analysis
+      spo2: spo2 || "",                   // For analysis
     });
 
     const outputParser = new StringOutputParser();
@@ -63,10 +63,10 @@ const generateSymptomSummary = async (req, res) => {
       heartRateInfo,
       bodyTemperatureInfo,
       spo2Info,
-      bloodPressure: bloodPressure || "Not provided",
-      heartRate: heartRate || "Not provided",
-      bodyTemperature: bodyTemperature || "Not provided",
-      spo2: spo2 || "Not provided",
+      bloodPressure: bloodPressure || "",
+      heartRate: heartRate || "",
+      bodyTemperature: bodyTemperature || "",
+      spo2: spo2 || "",
     })) {
       summary += chunk;
       global.io.emit("summary", { summary });
@@ -86,6 +86,7 @@ const generateSymptomSummary = async (req, res) => {
     }
   }
 };
+
 const analyzePatientReport = async (req, res) => {
   try {
     const { patientReport, reportId } = req.body;
