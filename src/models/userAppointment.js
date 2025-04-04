@@ -72,11 +72,17 @@ const appointmentSchema = new Schema(
       enum: ["Pending", "Created", "Accepted", "Completed", "Cancelled"],
       default: "Pending",
     },
+    call_status: {
+      type: String,
+      enum: ["idle", "ringing", "in_progress", "declined"],
+      default: "idle",
+    },
     testStatus: {
       type: String,
       enum: ["Normal", "High"],
       default: null,
     },
+    
     prescriptionFile: {
       type: String,
       default: null,

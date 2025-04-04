@@ -11,6 +11,8 @@ const {
   getDoctorDashboardData,
   getAllPatientsWithAppointmentDetails,
   getAppointmentsCountForAllStatuses,
+  startCall,
+  generateToken,
 } = require("../controllers/doctor");
 const { analyzePatientReport } = require("../controllers/symptoms");
 
@@ -24,5 +26,7 @@ router.get("/clinic/:doctorId", getDoctorClinic);
 router.get("/list", getAllDoctors);
 
 router.post("/symptom-analyser", analyzePatientReport);
+router.post("/call/start", startCall);
+router.post('/token', generateToken);
 
 module.exports = router;

@@ -11,6 +11,12 @@ const {
 const { default: mongoose } = require("mongoose");
 const patientProfile = require("../models/patientProfile");
 
+const {
+  jwt: { AccessToken },
+} = require("twilio");
+const VideoGrant = AccessToken.VideoGrant;
+const ChatGrant = AccessToken.ChatGrant;
+
 const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.params?.userId);
@@ -66,7 +72,7 @@ const updateProfile = async (req, res) => {
     if (email) {
       updateFields.email = email?.toLowerCase();
       updateUserFields.email = email?.toLowerCase();
-    } 
+    }
     // else if (email === "") {
     //   updateFields.email = null;
     //   updateUserFields.email = null;
@@ -433,7 +439,130 @@ const getAppointmentsCountForAllStatuses = async (req, res) => {
   }
 };
 
+// Call Controllers
+const startCall = async (req, res) => {
+  const { appointment_id, token, mode } = req.body;
+
+  // Validate request data
+  if (!appointment_id) {
+    return sendResponse(res, 400, "Missing required parameters");
+  }
+
+  try {
+    // Update the appointment status to "ringing"
+    const appointment = await PatientAppointment.findByIdAndUpdate(
+      appointment_id,
+      { call_status: "ringing" },
+      { new: true }
+    );
+
+    if (!appointment) {
+      return sendResponse(res, 400, "Appointment not found");
+    }
+
+    // Emit "incoming-call" event to the patient
+    global.io.to(`user-${appointment?.patientId}`).emit("incoming-call", {
+      appointment_id,
+      doctor_id: appointment?.refDoctor,
+      mode: mode,
+      token,
+    });
+
+    return sendResponse(res, 200, "Call initiated");
+  } catch (error) {
+    console.error("Error initiating call:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+const receiveCall = async (req, res) => {
+  const { appointment_id, patient_id, response } = req.body;
+
+  // Validate request data
+  if (!appointment_id || !response) {
+    return sendResponse(res, 400, "Missing required parameters");
+  }
+
+  try {
+    if (response === "accept") {
+      // Update the appointment status to "in_progress"
+      const appointment = await PatientAppointment.findByIdAndUpdate(
+        appointment_id,
+        { call_status: "in_progress" },
+        { new: true }
+      );
+
+      if (!appointment) {
+        return sendResponse(res, 400, "Appointment not found");
+      }
+
+      // Notify the doctor that the call was accepted
+      global.io.to(`user-${appointment?.refDoctor}`).emit("call-accepted", {
+        roomName: appointment_id,
+      });
+
+      return sendResponse(res, 200, "Call accepted");
+    } else if (response === "decline") {
+      // Update the appointment status to "declined"
+      const appointment = await PatientAppointment.findByIdAndUpdate(
+        appointment_id,
+        { call_status: "declined" },
+        { new: true }
+      );
+
+      if (!appointment) {
+        return sendResponse(res, 400, "Appointment not found");
+      }
+
+      // Notify the doctor that the call was declined
+      global.io.to(`user-${appointment?.refDoctor}`).emit("call-declined", {
+        appointment_id,
+        patient_id,
+      });
+
+      return sendResponse(res, 200, "Call declined");
+    } else {
+      return res.status(400).json({ error: "Invalid response type" });
+    }
+  } catch (error) {
+    console.error("Error responding to call:", error);
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+const generateToken = (req, res) => {
+  const { identity, roomName, mode } = req.body;
+
+  const token = new AccessToken(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_API_KEY,
+    process.env.TWILIO_API_SECRET,
+    { identity }
+  );
+
+  if (mode === "video" || mode === "audio") {
+    token.addGrant(new VideoGrant({ room: roomName }));
+  }
+
+  if (mode === "chat") {
+    token.addGrant(
+      new ChatGrant({
+        serviceSid: process.env.TWILIO_CHAT_SERVICE_SID,
+      })
+    );
+  }
+
+  return sendResponse(res, 200, "Token Generated", {
+    token: token.toJwt(),
+    roomName,
+  });
+  res.json({ token: token.toJwt() });
+};
+
 module.exports = {
+  generateToken,
+  startCall,
+  receiveCall,
   updateProfile,
   getAllDoctors,
   getAllPatientAppointment,

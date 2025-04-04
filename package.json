@@ -39,7 +39,7 @@
     "sendgrid": "^5.2.3",
     "socket.io": "^4.8.1",
     "stripe": "^16.10.0",
-    "twilio": "^5.3.6"
+    "twilio": "^5.5.1"
   },
   "devDependencies": {
     "html-loader": "^5.1.0",

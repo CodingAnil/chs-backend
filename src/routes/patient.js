@@ -30,6 +30,7 @@ const {
   getHealthReport,
 } = require("../controllers/patient");
 const { generateSymptomSummary } = require("../controllers/symptoms");
+const { receiveCall } = require("../controllers/doctor");
 
 router.put("/:userId", checkAuth, updateProfile);
 
@@ -71,5 +72,8 @@ router.delete("/report/:id", deleteSymptomReport);
 
 router.put("/update-health-report/:userId", addOrUpdateReport);
 router.get("/health-report/:userId", getHealthReport);
+
+//
+router.post("/call/respond", receiveCall);
 
 module.exports = router;
