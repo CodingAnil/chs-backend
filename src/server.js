@@ -36,26 +36,25 @@ app.use("/admin", adminRoutes);
 // app.use("/chat", chatRoutes);
 // app.use("/payment", paymentRoutes);
 
-const io = new Server(server, { 
-  cors: { origin: "*" } 
+// Socket setup
+global.io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
 });
 
-global.io = io;
-
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-  
+global.io.on("connection", (socket) => {
   socket.on("join-room", ({ userId }) => {
     socket.join(`user-${userId}`);
-    console.log(`User joined room: user-${userId}`);  
+    console.log(`User joined room: user-${userId}`);
   });
-  
+
   socket.on("decline-call", ({ toUserId }) => {
     io.to(`user-${toUserId}`).emit("call-declined");
   });
-  
+
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    console.log("user disconnected");
   });
 });
 
