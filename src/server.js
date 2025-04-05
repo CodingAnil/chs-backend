@@ -47,7 +47,7 @@ io.on("connection", (socket) => {
   
   socket.on("join-room", ({ userId }) => {
     socket.join(`user-${userId}`);
-    console.log(`User joined room: user-${userId}`);
+    console.log(`User joined room: user-${userId}`);  
   });
   
   socket.on("decline-call", ({ toUserId }) => {
