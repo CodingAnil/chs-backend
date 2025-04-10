@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon server.js",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "schema": "node src/dbhelper/generate-schema.js > schema.dbml"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,266 @@
+// DBML Export for dbdiagram.io
+
+Table cart {
+  _id ObjectId [primary key]
+  userId SchemaObjectId
+  items Array
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table contactus {
+  _id ObjectId [primary key]
+  name varchar
+  email varchar
+  userId varchar
+  phone varchar
+  services varchar
+  message varchar
+  createdAt timestamp
+}
+
+Table doctorclinc {
+  _id ObjectId [primary key]
+  doctorId SchemaObjectId
+  name varchar
+  subDetail varchar
+  location varchar
+  days Object
+  time varchar
+  offDay varchar
+  price varchar
+  status varchar
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table doctorprofile {
+  _id ObjectId [primary key]
+  firstName varchar
+  lastName varchar
+  displayName varchar
+  phoneNumber integer
+  email varchar
+  designation varchar
+  languages Object
+  address varchar
+  city varchar
+  state varchar
+  country varchar
+  availability boolean
+  achievement varchar
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table healthreport {
+  _id ObjectId [primary key]
+  userId SchemaObjectId
+  heartRate integer
+  bodyTemperature integer
+  glucoseLevel integer
+  spo2 integer
+  bloodPressure varchar
+  bmi integer
+  healthFile varchar
+  fileKey varchar
+  fileName varchar
+  updatedAt timestamp
+}
+
+Table patientprofile {
+  _id ObjectId [primary key]
+  patientId varchar
+  firstName varchar
+  lastName varchar
+  phoneNumber integer
+  email varchar
+  birthDate varchar
+  gender varchar
+  age varchar
+  bloodGroup varchar
+  address varchar
+  city varchar
+  state varchar
+  country varchar
+  pinCode integer
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table paymentdetails {
+  _id ObjectId [primary key]
+  userId SchemaObjectId
+  cardHolderName varchar
+  cardNumber varchar
+  expMonth varchar
+  expYear varchar
+  cvv varchar
+}
+
+Table pharmaprofile {
+  _id ObjectId [primary key]
+  firstName varchar
+  lastName varchar
+  phoneNumber integer
+  email varchar
+  address varchar
+  city varchar
+  state varchar
+  country varchar
+  availability boolean
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table products {
+  _id ObjectId [primary key]
+  categoryId SchemaObjectId
+  name varchar
+  companyName varchar
+  quantity integer
+  discount integer
+  stockQuantity integer
+  image varchar
+  description varchar
+  country varchar
+  price integer
+  SKUnumber varchar
+  category varchar
+  subcategory varchar
+  status varchar
+}
+
+Table symptomreport {
+  _id ObjectId [primary key]
+  patientId SchemaObjectId
+  age integer
+  height integer
+  weight integer
+  symptoms varchar
+  symptomReport varchar
+  bloodPressure varchar
+  heartRate varchar
+  bodyTemperature varchar
+  spo2 varchar
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table teamaplication {
+  _id ObjectId [primary key]
+  name varchar
+  phone varchar
+  userId varchar
+  email varchar
+  experience varchar
+  designation varchar
+  message varchar
+  resumeUrl varchar
+  resumeKey varchar
+  status varchar
+}
+
+Table user {
+  _id ObjectId [primary key]
+  name varchar
+  email varchar
+  password varchar
+  phoneNumber integer
+  fileKey varchar
+  coverImage varchar
+  role varchar
+  profile SchemaObjectId
+  subscription SchemaObjectId
+  notification boolean
+  status varchar
+  isVerified boolean
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table useraddress {
+  _id ObjectId [primary key]
+  userId SchemaObjectId
+  name varchar
+  mobileNo varchar
+  email varchar
+  city varchar
+  pincode varchar
+  state varchar
+  houseNumber varchar
+  landmark varchar
+  type varchar
+  createdAt timestamp
+}
+
+Table userappointment {
+  _id ObjectId [primary key]
+  patientId SchemaObjectId
+  name varchar
+  date timestamp
+  time varchar
+  refDoctor SchemaObjectId
+  amount integer
+  reason varchar
+  comments integer
+  appointmentType varchar
+  appointmentFor varchar
+  symptoms varchar
+  attachment varchar
+  fileKey varchar
+  appointmentPersonName varchar
+  isInsurance boolean
+  status varchar
+  call_status varchar
+  testStatus varchar
+  prescriptionFile varchar
+  prescriptionDate timestamp
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table userotp {
+  _id ObjectId [primary key]
+  otp varchar
+  phoneNumber integer
+  otpExpiry timestamp
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table userprescription {
+  _id ObjectId [primary key]
+  patientId SchemaObjectId
+  name varchar
+  attachment varchar
+  date timestamp
+  refDoctor SchemaObjectId
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Table userreports {
+  _id ObjectId [primary key]
+  patientId SchemaObjectId
+  name varchar
+  attachment varchar
+  description varchar
+  updatedAt timestamp
+  createdAt timestamp
+}
+
+Ref: cart.userId > user._id
+Ref: doctorclinc.doctorId > doctorprofile._id
+Ref: healthreport.userId > user._id
+Ref: paymentdetails.userId > user._id
+Ref: products.categoryId > categories._id
+Ref: symptomreport.patientId > patientprofile._id
+Ref: user.profile > doctorprofile._id
+Ref: user.subscription > usersubscription._id
+Ref: useraddress.userId > user._id
+Ref: userappointment.patientId > patientprofile._id
+Ref: userappointment.refDoctor > doctorprofile._id
+Ref: userprescription.patientId > patientprofile._id
+Ref: userprescription.refDoctor > doctorprofile._id
+Ref: userreports.patientId > patientprofile._id
