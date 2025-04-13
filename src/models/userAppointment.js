@@ -12,6 +12,10 @@ const appointmentSchema = new Schema(
       type: String,
       default: null,
     },
+    testName: {
+      type: String,
+      default: null,
+    },
     date: {
       type: Date,
       default: null,
@@ -34,7 +38,7 @@ const appointmentSchema = new Schema(
       // require: true,
     },
     comments: {
-      type: Number,
+      type: String,
       default: null,
     },
     appointmentType: {
@@ -77,13 +81,17 @@ const appointmentSchema = new Schema(
       enum: ["idle", "ringing", "in_progress", "declined"],
       default: "idle",
     },
-    testStatus: {
+    healthStatus: {
       type: String,
-      enum: ["Normal", "High"],
+      enum: ["Low", "Normal", "Medium", "High"],
       default: null,
     },
-    
+
     prescriptionFile: {
+      type: String,
+      default: null,
+    },
+    prescriptionFileKey: {
       type: String,
       default: null,
     },
