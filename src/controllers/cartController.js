@@ -9,7 +9,10 @@ const addProductToCart = async (req, res) => {
     const { userId } = req.params;
     const { productId, quantity } = req.body;
 
-    let cart = await Cart.findOne({ userId });
+    let cart = await Cart.findOne({ userId }).populate({
+      path: 'items.productId',
+      select: 'name price discount sellerDiscount image'
+    });
 
     if (!cart) {
       cart = new Cart({ userId, items: [] });
@@ -26,6 +29,12 @@ const addProductToCart = async (req, res) => {
     }
 
     await cart.save();
+    
+    // Populate the product details after saving
+    cart = await Cart.findById(cart._id).populate({
+      path: 'items.productId',
+      select: 'name price discount sellerDiscount image'
+    });
 
     sendResponse(res, 200, "Product added to cart", cart);
   } catch (error) {
@@ -87,11 +96,16 @@ const deleteCartItem = async (req, res) => {
 const getAllCartItems = async (req, res) => {
   try {
     const { userId } = req.params;
+    const cart = await Cart.findOne({ userId }).populate({
+      path: 'items.productId',
+      select: 'name price discount sellerDiscount image stockQuantity'
+    });
 
-    const cart = await Cart.findOne({ userId }).populate("items.productId");
-    if (!cart) return sendResponse(res, 404, "Cart not found");
+    if (!cart) {
+      return sendResponse(res, 404, "Cart not found");
+    }
 
-    sendResponse(res, 200, "Cart items fetched", cart);
+    sendResponse(res, 200, "Cart items retrieved successfully", cart);
   } catch (error) {
     console.error(error);
     sendResponse(res, 500, error.message);

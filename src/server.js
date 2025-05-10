@@ -41,20 +41,53 @@ global.io = new Server(server, {
   cors: {
     origin: "*",
   },
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
 global.io.on("connection", (socket) => {
+  console.log("New socket connection:", socket.id);
+
+  // Heartbeat handler
+  socket.on("heartbeat", () => {
+    socket.emit("heartbeat-ack");
+  });
+
   socket.on("join-room", ({ userId }) => {
+    if (!userId) {
+      socket.emit("error", { message: "User ID is required" });
+      return;
+    }
+    
     socket.join(`user-${userId}`);
-    console.log(`User joined room: user-${userId}`);
+    console.log(`User ${userId} joined room: user-${userId}`);
   });
 
   socket.on("decline-call", ({ toUserId }) => {
+    if (!toUserId) {
+      socket.emit("error", { message: "Recipient ID is required" });
+      return;
+    }
+    
     io.to(`user-${toUserId}`).emit("call-declined");
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on("call-ended", ({ toUserId }) => {
+    if (!toUserId) {
+      socket.emit("error", { message: "Recipient ID is required" });
+      return;
+    }
+    
+    io.to(`user-${toUserId}`).emit("call-ended");
+  });
+
+  socket.on("error", (error) => {
+    console.error("Socket error:", error);
+    socket.emit("error", { message: "An error occurred" });
+  });
+
+  socket.on("disconnect", (reason) => {
+    console.log("User disconnected:", socket.id, "Reason:", reason);
   });
 });
 

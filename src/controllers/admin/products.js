@@ -31,6 +31,7 @@ exports.getProducts = async (req, res) => {
       query.$or = [
         { name: { $regex: search, $options: "i" } }, // Case-insensitive search for name
         { description: { $regex: search, $options: "i" } }, // Case-insensitive search for description
+        { companyName: { $regex: search, $options: "i" } }, // Case-insensitive search for company name
       ];
     }
 

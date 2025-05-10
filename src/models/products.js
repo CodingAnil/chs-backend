@@ -40,6 +40,10 @@ const productSchema = new Schema(
       type: Number,
       default: null,
     },
+    sellerDiscount: {
+      type: Number,
+      default: null,
+    },
     stockQuantity: {
       type: Number,
       default: null,

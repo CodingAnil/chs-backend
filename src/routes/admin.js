@@ -22,6 +22,7 @@ const {
   updateApplication,
   createContact,
 } = require("../controllers/admin/feedback");
+const categoryRoutes = require("./admin/categories");
 
 const router = express.Router();
 
@@ -52,5 +53,8 @@ router.post("/apply", createApplication);
 router.get("/applications", getAllApplications);
 router.get("/applications/:id", getApplicationById);
 router.put("/applications/:id", updateApplication);
+
+// Category routes
+router.use("/categories", categoryRoutes);
 
 module.exports = router;
