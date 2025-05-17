@@ -18,8 +18,8 @@ const addProductToCart = async (req, res) => {
       cart = new Cart({ userId, items: [] });
     }
 
-    const existingItem = cart.items.find(
-      (item) => item.productId.toString() === productId
+    const existingItem = cart?.items?.find(
+      (item) => item?.productId?.toString() === productId
     );
 
     if (existingItem) {
@@ -52,8 +52,8 @@ const updateCartItem = async (req, res) => {
     const cart = await Cart.findOne({ userId });
     if (!cart) return sendResponse(res, 404, "Cart not found");
 
-    const item = cart.items.find(
-      (item) => item.productId.toString() === productId
+    const item = cart?.items?.find(
+      (item) => item?.productId?.toString() === productId
     );
 
     if (!item) return sendResponse(res, 404, "Product not in cart");
@@ -78,8 +78,8 @@ const deleteCartItem = async (req, res) => {
     const cart = await Cart.findOne({ userId });
     if (!cart) return sendResponse(res, 404, "Cart not found");
 
-    cart.items = cart.items.filter(
-      (item) => item.productId.toString() !== productId
+    cart.items = cart?.items?.filter(
+      (item) => item?.productId?.toString() !== productId
     );
 
     cart.updatedAt = Date.now();
