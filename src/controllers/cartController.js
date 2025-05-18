@@ -10,18 +10,20 @@ const addProductToCart = async (req, res) => {
     const { productId, quantity } = req.body;
 
     let cart = await Cart.findOne({ userId }).populate({
-      path: 'items.productId',
-      select: 'name price discount sellerDiscount image'
+      path: "items.productId",
+      select: "name price discount sellerDiscount image",
     });
 
     if (!cart) {
       cart = new Cart({ userId, items: [] });
     }
 
+    console.log(cart, "cart");
     const existingItem = cart?.items?.find(
-      (item) => item?.productId?.toString() === productId
+      (item) => item?.productId?._id?.toString() === productId?.toString()
     );
 
+    console.log(existingItem, "existingItem");
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
@@ -29,11 +31,11 @@ const addProductToCart = async (req, res) => {
     }
 
     await cart.save();
-    
+
     // Populate the product details after saving
     cart = await Cart.findById(cart._id).populate({
-      path: 'items.productId',
-      select: 'name price discount sellerDiscount image'
+      path: "items.productId",
+      select: "name price discount sellerDiscount image",
     });
 
     sendResponse(res, 200, "Product added to cart", cart);
@@ -96,14 +98,21 @@ const deleteCartItem = async (req, res) => {
 const getAllCartItems = async (req, res) => {
   try {
     const { userId } = req.params;
+
     const cart = await Cart.findOne({ userId }).populate({
-      path: 'items.productId',
-      select: 'name price discount sellerDiscount image stockQuantity'
+      path: "items.productId",
+      select: "name price discount sellerDiscount image stockQuantity",
     });
 
     if (!cart) {
       return sendResponse(res, 404, "Cart not found");
     }
+
+    // Filter out items with null productId (i.e., product not found or deleted)
+    cart.items = cart.items.filter((item) => item.productId !== null);
+
+    // Optionally, save updated cart (if you want to persist the cleanup)
+    await cart.save();
 
     sendResponse(res, 200, "Cart items retrieved successfully", cart);
   } catch (error) {
@@ -129,7 +138,16 @@ const saveAddress = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!userId || !name || !mobileNo || !city || !pincode || !state || !houseNumber || !type) {
+    if (
+      !userId ||
+      !name ||
+      !mobileNo ||
+      !city ||
+      !pincode ||
+      !state ||
+      !houseNumber ||
+      !type
+    ) {
       return sendResponse(res, 400, "All required fields must be provided.");
     }
 
@@ -154,7 +172,6 @@ const saveAddress = async (req, res) => {
   }
 };
 
-
 // Get all addresses for a user
 const getUserAddresses = async (req, res) => {
   try {
@@ -175,7 +192,6 @@ const getUserAddresses = async (req, res) => {
     sendResponse(res, 500, error.message);
   }
 };
-
 
 // Delete Address
 const deleteAddress = async (req, res) => {
