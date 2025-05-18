@@ -53,6 +53,8 @@ global.io.on("connection", (socket) => {
     socket.emit("heartbeat-ack");
   });
 
+  
+
   socket.on("join-room", ({ userId }) => {
     if (!userId) {
       socket.emit("error", { message: "User ID is required" });
