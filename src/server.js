@@ -21,15 +21,17 @@ const app = express();
 const server = http.createServer(app);
 
 // -------------------- MIDDLEWARES --------------------
-app.use(cors({
-  origin: [
-    "http://localhost:3000", 
-    "http://localhost:3001",
-    "https://chshealthcare.in",
-    "https://admin.chshealthcare.in"
-  ],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://chshealthcare.in",
+      "https://admin.chshealthcare.in",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use("/uploads", express.static("uploads"));
@@ -45,10 +47,10 @@ app.use("/admin", adminRoutes);
 const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:3000", 
+      "http://localhost:3000",
       "http://localhost:3001",
       "https://chshealthcare.in",
-      "https://admin.chshealthcare.in"
+      "https://admin.chshealthcare.in",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -82,7 +84,8 @@ io.on("connection", (socket) => {
       socket.emit("error", { message: "Recipient ID is required" });
       return;
     }
-    io.to(`user-${toUserId}`).emit("call-declined");
+    io.emit("call-declined");
+    // io.to(`user-${toUserId}`).emit("call-declined");
   });
 
   socket.on("call-ended", ({ toUserId }) => {

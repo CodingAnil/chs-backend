@@ -461,12 +461,18 @@ const startCall = async (req, res) => {
     }
 
     // Emit "incoming-call" event to the patient
-    global.io.to(`user-${appointment?.patientId}`).emit("incoming-call", {
+    global.io.emit("incoming-call", {
       appointment_id,
       doctor_id: appointment?.refDoctor,
       mode: mode,
       token,
     });
+    // global.io.to(`user-${appointment?.patientId}`).emit("incoming-call", {
+    //   appointment_id,
+    //   doctor_id: appointment?.refDoctor,
+    //   mode: mode,
+    //   token,
+    // });
 
     return sendResponse(res, 200, "Call initiated");
   } catch (error) {
@@ -497,9 +503,12 @@ const receiveCall = async (req, res) => {
       }
 
       // Notify the doctor that the call was accepted
-      global.io.to(`user-${appointment?.refDoctor}`).emit("call-accepted", {
+      global.io.emit("call-accepted", {
         roomName: appointment_id,
       });
+      // global.io.to(`user-${appointment?.refDoctor}`).emit("call-accepted", {
+      //   roomName: appointment_id,
+      // });
 
       return sendResponse(res, 200, "Call accepted");
     } else if (response === "decline") {
@@ -515,10 +524,14 @@ const receiveCall = async (req, res) => {
       }
 
       // Notify the doctor that the call was declined
-      global.io.to(`user-${appointment?.refDoctor}`).emit("call-declined", {
+      global.io.emit("call-declined", {
         appointment_id,
         patient_id,
       });
+      // global.io.to(`user-${appointment?.refDoctor}`).emit("call-declined", {
+      //   appointment_id,
+      //   patient_id,
+      // });
 
       return sendResponse(res, 200, "Call declined");
     } else {
