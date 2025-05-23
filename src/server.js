@@ -99,6 +99,7 @@ global.io.on("connection", (socket) => {
 
 // testing router
 app.get("/", (req, res) => {
+  
   return res.status(200).json({
     success: true,
     message: "CHS-Health apis is running",
