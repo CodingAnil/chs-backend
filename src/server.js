@@ -39,8 +39,12 @@ app.use("/admin", adminRoutes);
 // Socket setup
 global.io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: ["https://chshealthcare.in", "http://localhost:3000"], // Add your frontend domains
+    methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["my-custom-header"],
   },
+  transports: ['websocket', 'polling'], // Enable both transports
   pingTimeout: 60000,
   pingInterval: 25000,
 });
