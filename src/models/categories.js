@@ -36,7 +36,7 @@ const categorySchema = new Schema(
 );
 
 // Index for optimized search
-categorySchema.index({ name: 1 });
+// categorySchema.index({ name: 1 });
 
 const Category = mongoose.model("Categories", categorySchema);
 

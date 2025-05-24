@@ -39,14 +39,23 @@ app.use("/admin", adminRoutes);
 // Socket setup
 global.io = new Server(server, {
   cors: {
-    origin: ["https://chshealthcare.in", "http://localhost:3000"], // Add your frontend domains
+    origin: [
+      "https://api.chshealthcare.in",
+      "https://chshealthcare.in",
+      "http://localhost:3000",
+      "http://localhost:5000",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
     allowedHeaders: ["my-custom-header"],
   },
-  transports: ['websocket', 'polling'], // Enable both transports
+  transports: ["websocket", "polling"], // Enable both transports
   pingTimeout: 60000,
   pingInterval: 25000,
+});
+
+global.io.on("connect_error", (err) => {
+  console.error("Socket connection error:", err.message);
 });
 
 global.io.on("connection", (socket) => {
@@ -57,14 +66,12 @@ global.io.on("connection", (socket) => {
     socket.emit("heartbeat-ack");
   });
 
-  
-
   socket.on("join-room", ({ userId }) => {
     if (!userId) {
       socket.emit("error", { message: "User ID is required" });
       return;
     }
-    
+
     socket.join(`user-${userId}`);
     console.log(`User ${userId} joined room: user-${userId}`);
   });
@@ -74,7 +81,7 @@ global.io.on("connection", (socket) => {
       socket.emit("error", { message: "Recipient ID is required" });
       return;
     }
-    
+
     io.to(`user-${toUserId}`).emit("call-declined");
   });
 
@@ -83,7 +90,7 @@ global.io.on("connection", (socket) => {
       socket.emit("error", { message: "Recipient ID is required" });
       return;
     }
-    
+
     io.to(`user-${toUserId}`).emit("call-ended");
   });
 
@@ -99,7 +106,6 @@ global.io.on("connection", (socket) => {
 
 // testing router
 app.get("/", (req, res) => {
-  
   return res.status(200).json({
     success: true,
     message: "CHS-Health apis is running",
