@@ -86,11 +86,11 @@ global.io.on("connection", (socket) => {
     io.emit("call-declined");
   });
 
-  socket.on("call-ended", ({ toUserId }) => {
-    if (!toUserId) {
-      socket.emit("error", { message: "Recipient ID is required" });
-      return;
-    }
+  socket.on("call-end", () => {
+    // if (!toUserId) {
+    //   socket.emit("error", { message: "Recipient ID is required" });
+    //   return;
+    // }
 
     // io.to(`user-${toUserId}`).emit("call-ended");
     io.emit("call-ended");
