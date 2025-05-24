@@ -82,7 +82,8 @@ global.io.on("connection", (socket) => {
       return;
     }
 
-    io.to(`user-${toUserId}`).emit("call-declined");
+    // io.to(`user-${toUserId}`).emit("call-declined");
+    io.emit("call-declined");
   });
 
   socket.on("call-ended", ({ toUserId }) => {
@@ -91,7 +92,8 @@ global.io.on("connection", (socket) => {
       return;
     }
 
-    io.to(`user-${toUserId}`).emit("call-ended");
+    // io.to(`user-${toUserId}`).emit("call-ended");
+    io.emit("call-ended");
   });
 
   socket.on("error", (error) => {
