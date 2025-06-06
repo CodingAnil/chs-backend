@@ -95,6 +95,12 @@ const appointmentSchema = new Schema(
       type: String,
       default: null,
     },
+
+    prescriptionText: {
+      type: String,
+      default: null,
+    },
+
     prescriptionDate: {
       type: Date,
       default: null,
