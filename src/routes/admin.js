@@ -23,6 +23,8 @@ const {
   createContact,
 } = require("../controllers/admin/feedback");
 const categoryRoutes = require("./admin/categories");
+const { checkAuth } = require("../middlewares/auth");
+const { getAllAppointments } = require("../controllers/admin/appointments");
 
 const router = express.Router();
 
@@ -53,6 +55,9 @@ router.post("/apply", createApplication);
 router.get("/applications", getAllApplications);
 router.get("/applications/:id", getApplicationById);
 router.put("/applications/:id", updateApplication);
+
+// Add this new route before the category routes
+router.get("/appointments", checkAuth, getAllAppointments);
 
 // Category routes
 router.use("/categories", categoryRoutes);
