@@ -23,8 +23,9 @@ const {
   createContact,
 } = require("../controllers/admin/feedback");
 const categoryRoutes = require("./admin/categories");
-const { checkAuth } = require("../middlewares/auth");
+const { checkAuth,checkAdminAuth } = require("../middlewares/auth");
 const { getAllAppointments } = require("../controllers/admin/appointments");
+const orderRoutes = require("./admin/orderRoutes");
 
 const router = express.Router();
 
@@ -59,7 +60,13 @@ router.put("/applications/:id", updateApplication);
 // Add this new route before the category routes
 router.get("/appointments", checkAuth, getAllAppointments);
 
+// Apply admin middleware to all routes
+// router.use(checkAuth, checkAdmin);
+
 // Category routes
 router.use("/categories", categoryRoutes);
+
+// Orders routes
+router.use("/orders", orderRoutes);
 
 module.exports = router;
