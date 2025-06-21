@@ -454,25 +454,39 @@ const startCall = async (req, res) => {
       appointment_id,
       { call_status: "ringing" },
       { new: true }
-    );
+    ).populate("patientId");
 
     if (!appointment) {
       return sendResponse(res, 400, "Appointment not found");
     }
 
-    // Emit "incoming-call" event to the patient
-    global.io.emit("incoming-call",{
+    console.log("Appointment found:", {
+      appointmentId: appointment._id,
+      patientId: appointment.patientId._id,
+      doctorId: appointment.refDoctor,
+      mode: mode
+    });
+
+    // Check if the patient's room exists
+    const patientRoom = `user-${appointment.patientId._id}`;
+    const roomSockets = global.io.sockets.adapter.rooms.get(patientRoom);
+    
+    console.log("Socket room check:", {
+      patientRoom,
+      roomExists: !!roomSockets,
+      socketCount: roomSockets ? roomSockets.size : 0,
+      allRooms: Array.from(global.io.sockets.adapter.rooms.keys())
+    });
+
+    // Emit "incoming-call" event to the specific patient only
+    global.io.to(patientRoom).emit("incoming-call", {
       appointment_id,
       doctor_id: appointment?.refDoctor,
       mode: mode,
       token,
     });
-    // global.io.to(`user-${appointment?.patientId}`).emit("incoming-call", {
-    //   appointment_id,
-    //   doctor_id: appointment?.refDoctor,
-    //   mode: mode,
-    //   token,
-    // });
+
+    console.log(`📞 Call initiated and emitted to room: ${patientRoom}`);
 
     return sendResponse(res, 200, "Call initiated");
   } catch (error) {
@@ -490,48 +504,39 @@ const receiveCall = async (req, res) => {
   }
 
   try {
+    const appointment = await PatientAppointment.findById(appointment_id).populate("refDoctor");
+    
+    if (!appointment) {
+      return sendResponse(res, 400, "Appointment not found");
+    }
+
     if (response === "accept") {
       // Update the appointment status to "in_progress"
-      const appointment = await PatientAppointment.findByIdAndUpdate(
+      await PatientAppointment.findByIdAndUpdate(
         appointment_id,
         { call_status: "in_progress" },
         { new: true }
       );
 
-      if (!appointment) {
-        return sendResponse(res, 400, "Appointment not found");
-      }
-
       // Notify the doctor that the call was accepted
-      global.io.emit("call-accepted",{
+      global.io.to(`user-${appointment.refDoctor._id}`).emit("call-accepted", {
         roomName: appointment_id,
       });
-      // global.io.to(`user-${appointment?.refDoctor}`).emit("call-accepted", {
-      //   roomName: appointment_id,
-      // });
 
       return sendResponse(res, 200, "Call accepted");
     } else if (response === "decline") {
       // Update the appointment status to "declined"
-      const appointment = await PatientAppointment.findByIdAndUpdate(
+      await PatientAppointment.findByIdAndUpdate(
         appointment_id,
         { call_status: "declined" },
         { new: true }
       );
 
-      if (!appointment) {
-        return sendResponse(res, 400, "Appointment not found");
-      }
-
       // Notify the doctor that the call was declined
-      global.io.emit("call-declined",{
+      global.io.to(`user-${appointment.refDoctor._id}`).emit("call-declined", {
         appointment_id,
         patient_id,
       });
-      // global.io.to(`user-${appointment?.refDoctor}`).emit("call-declined", {
-      //   appointment_id,
-      //   patient_id,
-      // });
 
       return sendResponse(res, 200, "Call declined");
     } else {
@@ -569,7 +574,40 @@ const generateToken = (req, res) => {
     token: token.toJwt(),
     roomName,
   });
-  res.json({ token: token.toJwt() });
+};
+
+// Test endpoint to check socket connections
+const testSocketConnection = async (req, res) => {
+  const { userId } = req.params;
+  
+  try {
+    const rooms = global.io.sockets.adapter.rooms;
+    const userRoom = `user-${userId}`;
+    const roomSockets = rooms.get(userRoom);
+    
+    const socketInfo = {
+      userId,
+      userRoom,
+      roomExists: !!roomSockets,
+      socketCount: roomSockets ? roomSockets.size : 0,
+      socketIds: roomSockets ? Array.from(roomSockets) : [],
+      allRooms: Array.from(rooms.keys()).filter(room => room.startsWith('user-')),
+      totalConnections: global.io.engine.clientsCount
+    };
+    
+    console.log("Socket test for user:", socketInfo);
+    
+    // Test emit to the user
+    global.io.to(userRoom).emit("test-message", {
+      message: "Test message from server",
+      timestamp: new Date().toISOString()
+    });
+    
+    return sendResponse(res, 200, "Socket test completed", socketInfo);
+  } catch (error) {
+    console.error("Socket test error:", error);
+    return sendResponse(res, 500, error.message);
+  }
 };
 
 module.exports = {
@@ -583,4 +621,5 @@ module.exports = {
   getDoctorClinic,
   getAllPatientsWithAppointmentDetails,
   getAppointmentsCountForAllStatuses,
+  testSocketConnection,
 };

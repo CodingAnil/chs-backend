@@ -13,6 +13,7 @@ const {
   getAppointmentsCountForAllStatuses,
   startCall,
   generateToken,
+  testSocketConnection,
 } = require("../controllers/doctor");
 const { analyzePatientReport } = require("../controllers/symptoms");
 
@@ -27,6 +28,7 @@ router.get("/list", getAllDoctors);
 
 router.post("/symptom-analyser", analyzePatientReport);
 router.post("/call/start", startCall);
-router.post('/token', generateToken);
+router.post("/token", generateToken);
+router.get("/test-socket/:userId", testSocketConnection);
 
 module.exports = router;
