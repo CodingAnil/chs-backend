@@ -39,13 +39,9 @@ app.use("/orders", ordersRoutes);
 
 // Socket setup
 global.io = new Server(server, {
+  path: "/socket.io",
   cors: {
-    origin: [
-      "https://api.chshealthcare.in",
-      "https://chshealthcare.in",
-      "http://localhost:3000",
-      "http://localhost:5000",
-    ],
+    origin: ["*"],
     methods: ["GET", "POST"],
     credentials: true,
     allowedHeaders: ["my-custom-header"],
@@ -78,13 +74,15 @@ global.io.on("connection", (socket) => {
         return;
       }
 
-      console.log(`User ${userId} attempting to join room with socket ${socket.id}`);
+      console.log(
+        `User ${userId} attempting to join room with socket ${socket.id}`
+      );
 
       // Store userId in socket for reference
       socket.userId = userId;
-      
+
       // Leave any existing rooms first
-      socket.rooms.forEach(room => {
+      socket.rooms.forEach((room) => {
         if (room !== socket.id) {
           console.log(`Leaving room: ${room}`);
           socket.leave(room);
@@ -95,17 +93,20 @@ global.io.on("connection", (socket) => {
       const userRoom = `user-${userId}`;
       socket.join(userRoom);
       console.log(`User ${userId} joined room: ${userRoom}`);
-      
+
       // Log all rooms for debugging
-      console.log(`Socket ${socket.id} is now in rooms:`, Array.from(socket.rooms));
-      
+      console.log(
+        `Socket ${socket.id} is now in rooms:`,
+        Array.from(socket.rooms)
+      );
+
       // Verify room joining
       setTimeout(() => {
         const roomSockets = global.io.sockets.adapter.rooms.get(userRoom);
         console.log(`Room verification for ${userRoom}:`, {
           roomExists: !!roomSockets,
           socketCount: roomSockets ? roomSockets.size : 0,
-          socketIds: roomSockets ? Array.from(roomSockets) : []
+          socketIds: roomSockets ? Array.from(roomSockets) : [],
         });
       }, 500);
     } catch (error) {
@@ -116,8 +117,11 @@ global.io.on("connection", (socket) => {
 
   socket.on("decline-call", ({ toUserId }) => {
     try {
-      console.log("Decline-call event received:", { fromUserId: socket.userId, toUserId });
-      
+      console.log("Decline-call event received:", {
+        fromUserId: socket.userId,
+        toUserId,
+      });
+
       if (!toUserId) {
         console.warn("Decline-call: Recipient ID is missing");
         socket.emit("error", { message: "Recipient ID is required" });
@@ -135,14 +139,19 @@ global.io.on("connection", (socket) => {
 
   socket.on("call-end", ({ toUserId }) => {
     try {
-      console.log("Call-end event received:", { fromUserId: socket.userId, toUserId });
-      
+      console.log("Call-end event received:", {
+        fromUserId: socket.userId,
+        toUserId,
+      });
+
       if (toUserId) {
         console.log(`Call ended from ${socket.userId} to ${toUserId}`);
         // Target specific user
         global.io.to(`user-${toUserId}`).emit("call-ended");
       } else {
-        console.log(`Call ended broadcast from ${socket.userId} (no specific recipient)`);
+        console.log(
+          `Call ended broadcast from ${socket.userId} (no specific recipient)`
+        );
         // Broadcast to all if no specific user
         global.io.emit("call-ended");
       }
@@ -158,20 +167,29 @@ global.io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", (reason) => {
-    console.log("User disconnected:", socket.id, "User ID:", socket.userId, "Reason:", reason);
+    console.log(
+      "User disconnected:",
+      socket.id,
+      "User ID:",
+      socket.userId,
+      "Reason:",
+      reason
+    );
   });
 });
 
 // Add monitoring for debugging
 setInterval(() => {
   const rooms = global.io.sockets.adapter.rooms;
-  const activeRooms = Array.from(rooms.keys()).filter(room => room !== 'undefined');
+  const activeRooms = Array.from(rooms.keys()).filter(
+    (room) => room !== "undefined"
+  );
   console.log("=== Socket Monitoring ===");
   console.log("Active rooms:", activeRooms);
   console.log("Total connected clients:", global.io.engine.clientsCount);
-  
+
   // Log details for each room
-  activeRooms.forEach(room => {
+  activeRooms.forEach((room) => {
     const roomSockets = rooms.get(room);
     console.log(`Room ${room}: ${roomSockets.size} sockets`);
   });
