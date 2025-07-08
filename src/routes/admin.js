@@ -13,6 +13,7 @@ const {
   updateProduct,
   deleteProduct,
   updateProductStatus,
+  getProductsForUser,
 } = require("../controllers/admin/products");
 const { setQueryType } = require("../middlewares/middle");
 const {
@@ -39,6 +40,7 @@ router.put("/reset-password", resetPassword);
 // pharmacy products
 router.post("/product", createProduct);
 router.get("/products", getProducts);
+router.get("/products-for-user", getProductsForUser);
 router.get("/product/:id", getProductById);
 router.put("/product/:id", updateProduct);
 router.delete("/product/:id", deleteProduct);

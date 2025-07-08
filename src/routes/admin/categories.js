@@ -12,6 +12,9 @@ router.post("/", categoryController.createCategory);
 // Get all categories with search and pagination
 router.get("/", categoryController.getAllCategories);
 
+// Get all categories for dropdown (no pagination or search)
+router.get("/dropdown", categoryController.getAllCategoriesForDropdown);
+
 // Get category by ID
 router.get("/:id", categoryController.getCategoryById);
 

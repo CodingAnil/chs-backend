@@ -16,7 +16,7 @@ exports.createProduct = async (req, res) => {
 exports.getProducts = async (req, res) => {
   try {
     const {
-      page = 1,
+      currentPage: page = 1,
       limit = 10,
       search = "",
       category = "",
@@ -37,6 +37,50 @@ exports.getProducts = async (req, res) => {
 
     if (category) {
       query.category = category; // Exact match for category
+    }
+
+    // Pagination and sorting
+    const skip = (page - 1) * limit;
+    const products = await Product.find(query)
+      .sort({ [sort]: order === "desc" ? -1 : 1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Product.countDocuments(query);
+
+    return sendResponse(res, 200, "Product retrieved successfully", products, {
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      pages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    return sendResponse(res, 500, error.message);
+  }
+};
+
+// Get all products with pagination
+exports.getProductsForUser = async (req, res) => {
+  try {
+    const {
+      currentPage: page = 1,
+      category = "",
+      sort = "createdAt",
+      order = "desc",
+    } = req.query;
+
+    let limit = 20;
+    let status = "Published";
+    // Create search query
+    let query = {};
+
+
+    if (category) {
+      query.category = category; // Exact match for category
+    }
+
+    if (status) {
+      query.status = status; // Exact match for status
     }
 
     // Pagination and sorting

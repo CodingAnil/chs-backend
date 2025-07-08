@@ -61,6 +61,24 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
+// Get all categories formatted for dropdown
+exports.getAllCategoriesForDropdown = async (req, res) => {
+  try {
+    const categories = await Category.find({ status: 'Active' }).sort({ createdAt: -1 });
+
+    const formatted = {};
+
+    categories.forEach((cat) => {
+      const subcatNames = cat.subcategories?.map((sub) => sub.name) || [];
+      formatted[cat.name] = subcatNames;
+    });
+
+    return sendResponse(res, 200, "Categories formatted for dropdown", formatted);
+  } catch (error) {
+    return sendResponse(res, 500, error.message);
+  }
+};
+
 // Get category by ID
 exports.getCategoryById = async (req, res) => {
   try {
