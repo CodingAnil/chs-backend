@@ -14,6 +14,9 @@ const {
   adminRoutes,
   paymentRoutes,
   ordersRoutes,
+  pathologyRoutes,
+  nurseRoutes,
+  commonRoutes,
 } = require("./routes/index.js");
 
 const app = express();
@@ -32,6 +35,9 @@ app.use("/patient", patientRoutes);
 app.use("/doctor", doctorRoutes);
 app.use("/admin", adminRoutes);
 app.use("/orders", ordersRoutes);
+app.use("/pathology", pathologyRoutes);
+app.use("/nurse", nurseRoutes);
+app.use("/common", commonRoutes);
 
 // app.use("/interaction", interactionRoutes);
 // app.use("/chat", chatRoutes);

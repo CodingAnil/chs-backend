@@ -8,11 +8,13 @@ const uploadFile = async (req, res, next) => {
     const { file } = req;
     console.log(file, "file");
     if (file) {
-      return sendResponse(res, 200, "file is uploded successfully!", {
+      let resp = sendResponse(res, 200, "file is uploded successfully!", {
         originalname: file.originalname,
         key: file?.key,
         location: file.location,
       });
+      console.log(resp);
+      return resp;
     } else {
       return sendResponse(res, 400, "file is not uploded!");
     }
