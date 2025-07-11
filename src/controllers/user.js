@@ -4,6 +4,8 @@ const sendSms = require("../configs/sendSms");
 const doctorProfile = require("../models/doctorProfile");
 const patientProfile = require("../models/patientProfile");
 const pharmaProfile = require("../models/pharmaProfile");
+const pathologyLabProfile = require("../models/PathologyLabProfile");
+const nurseProfile = require("../models/nurseProfile");
 const User = require("../models/user");
 const UserOtp = require("../models/userOtp");
 const {
@@ -35,6 +37,9 @@ const signUp = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    console.log(role, "role");
+    console.log("Creating New profile", "action");
+
     let newProfile = null;
     if (role?.toLowerCase() == "patient") {
       newProfile = new patientProfile({
@@ -53,6 +58,22 @@ const signUp = async (req, res) => {
       });
     } else if (role?.toLowerCase() == "pharmacy retailers") {
       newProfile = new pharmaProfile({
+        firstName: name,
+        phoneNumber,
+        email: email?.toLowerCase(),
+        address,
+      });
+    } 
+    else if (role?.toLowerCase() == "nursing") {
+      newProfile = new nurseProfile({
+        firstName: name,
+        phoneNumber,
+        email: email?.toLowerCase(),
+        address,
+      });
+    }
+    else if (role?.toLowerCase() == "pathology") {
+      newProfile = new pathologyLabProfile({
         firstName: name,
         phoneNumber,
         email: email?.toLowerCase(),
@@ -518,18 +539,25 @@ const getAllUsers = async (req, res) => {
 
 const getUserWithProfile = async (id) => {
   try {
+    console.log(id, "geting User details");
+    
     if (!id) throw new Error("User id is required.");
 
     const user = await User.findOne({ _id: id });
     if (!user) return null;
-
+    console.log(user.profile, "geting User details");
     ({ password, notification, ...withoutSensitiveInfo } = user.toObject());
-    const profile =
-      user.role != "Doctor"
-        ? await patientProfile.findById(user.profile)
-        : await doctorProfile.findById(user.profile);
 
-    console.log(profile, "user");
+    console.log(id, "geting dedicated profile");
+    const profile =
+      user.role == "Doctor"
+        ? await doctorProfile.findById(user.profile)
+        : user.role == "Pathology" ? await pathologyLabProfile.findById(user.profile)
+        : user.role?.toLowerCase() == "nursing" ? await nurseProfile.findById(user.profile.toString())
+        : await patientProfile.findById(user.profile);
+
+    console.log(profile, "profile");
+    console.log(user.role, "user.role");
     return {
       ...withoutSensitiveInfo,
       profile: profile ? profile.toObject() : null,

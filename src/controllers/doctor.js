@@ -109,9 +109,11 @@ const updateProfile = async (req, res) => {
 
 const getAllDoctors = async (req, res) => {
   try {
-    let doctors = await User.find({ role: "Doctor" })
+    let doctors = await User.find({ role: { $in:["Doctor"]} })
       .populate("profile")
       .exec();
+
+      
     if (!doctors || doctors?.length == 0) {
       return sendResponse(res, 200, "Doctors not found");
     }

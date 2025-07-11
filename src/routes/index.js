@@ -4,6 +4,9 @@ const doctorRoutes = require("./doctor");
 const adminRoutes = require("./admin");
 const paymentRoutes = require("./payment");
 const ordersRoutes = require("./orders");
+const pathologyRoutes = require("./pathology");
+const nurseRoutes = require("./nurse");
+const commonRoutes = require("./common");
 
 module.exports = {
   userRoutes,
@@ -12,4 +15,7 @@ module.exports = {
   adminRoutes,
   paymentRoutes,
   ordersRoutes,
+  pathologyRoutes,
+  nurseRoutes,
+  commonRoutes,
 };
